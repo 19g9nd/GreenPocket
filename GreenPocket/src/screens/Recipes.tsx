@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from 'react';
+import React, { useEffect } from 'react';
 import {
   View,
   Text,
@@ -8,39 +8,29 @@ import {
   TouchableOpacity,
   Image,
 } from 'react-native';
+import { useDispatch, useSelector } from 'react-redux';
+import { fetchRecipes, selectRecipes, selectLoading } from '../redux/recipesSlice';
 
 // @ts-ignore
-export function RecipesScreen({route, navigation}) {
-  const {category} = route.params || '';
-  const [recipes, setRecipes] = useState([]);
-  const [loading, setLoading] = useState(true);
+export function RecipesScreen({ route, navigation }) {
+  const { category } = route.params || '';
+
+  const dispatch = useDispatch();
+  const recipes = useSelector(selectRecipes);
+  const loading = useSelector(selectLoading);
 
   useEffect(() => {
-    const selectedCategory = category ? category.toLowerCase() : '';
-    const url = selectedCategory
-      ? `https://api.spoonacular.com/recipes/complexSearch?type=${selectedCategory}&apiKey=db7c6cb5efa547068f9f57b21cb1855d`
-      : `https://api.spoonacular.com/recipes/complexSearch?apiKey=db7c6cb5efa547068f9f57b21cb1855d`;
-
-    fetch(
-      url,
-    )
-      .then(response => response.json())
-      .then(data => {
-        setRecipes(data.results);
-        setLoading(false);
-      })
-      .catch(error => {
-        console.error('Error fetching recipes:', error);
-        setLoading(false);
-      });
-  }, [category]);
+    // @ts-ignore
+    dispatch(fetchRecipes(category));
+  }, [category, dispatch]);
 
   // @ts-ignore
-  const renderRecipe = ({item}) => (
+  const renderRecipe = ({ item }) => (
     <TouchableOpacity
       style={styles.recipeItem}
-      onPress={() => navigation.navigate('RecipeDetails', {recipeId: item.id})}>
-      <Image source={{uri: item.image}} style={styles.recipeImage} />
+      onPress={() => navigation.navigate('RecipeDetails', { recipeId: item.id })}
+    >
+      <Image source={{ uri: item.image }} style={styles.recipeImage} />
       <Text style={styles.recipeName}>{item.title}</Text>
     </TouchableOpacity>
   );

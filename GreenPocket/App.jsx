@@ -6,10 +6,13 @@ import {HomeScreen} from './src/screens/Home';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import {DiaryScreen} from './src/screens/Diary';
 import {RecipesScreen} from './src/screens/Recipes';
+import { Provider } from 'react-redux'
+import store from './src/redux/store'
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
 const App = () => {
   return (
+    <Provider store={store}>
     <NavigationContainer>
       <Tab.Navigator  screenOptions={{ headerShown: false }}>
         <Tab.Screen name="Home" component={HomeScreen} />
@@ -17,6 +20,8 @@ const App = () => {
         <Tab.Screen name="Recipes" component={RecipesScreen} />
       </Tab.Navigator>
     </NavigationContainer>
+
+    </Provider>
   );
 };
 const styles = StyleSheet.create({});

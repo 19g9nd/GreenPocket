@@ -1,0 +1,1 @@
+export const spoonacularAPIKey = 'db7c6cb5efa547068f9f57b21cb1855d';
