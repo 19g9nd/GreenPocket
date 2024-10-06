@@ -13,7 +13,9 @@ import { fetchRecipes, selectRecipes, selectLoading } from '../redux/recipesSlic
 
 // @ts-ignore
 export function RecipesScreen({ route, navigation }) {
-  const { category } = route.params || '';
+  const { category, query } = route.params || {};
+
+
 
   const dispatch = useDispatch();
   const recipes = useSelector(selectRecipes);
@@ -21,8 +23,8 @@ export function RecipesScreen({ route, navigation }) {
 
   useEffect(() => {
     // @ts-ignore
-    dispatch(fetchRecipes(category));
-  }, [category, dispatch]);
+    dispatch(fetchRecipes({ category, query }));
+  }, [category, query, dispatch]);
 
   // @ts-ignore
   const renderRecipe = ({ item }) => (

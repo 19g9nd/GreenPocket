@@ -1,10 +1,11 @@
-import React from 'react';
+import React, {useState} from 'react';
 import { Text, TextInput, View, StyleSheet, FlatList, TouchableOpacity } from 'react-native';
 
 // @ts-ignore
 export function HomeScreen({ navigation }) {
   const categories = ['Breakfast', 'Lunch', 'Salads', 'Drinks', 'Dinner', 'Desserts'];
   const services = ['Menu for week', 'Product list', 'Find recipe'];
+  const [searchQuery, setSearchQuery] = useState('');
   // @ts-ignore
   const renderCategory = ({ item }) => (
     <TouchableOpacity
@@ -22,6 +23,12 @@ export function HomeScreen({ navigation }) {
     </TouchableOpacity>
   );
 
+  const handleSearch = () => {
+    if (searchQuery.trim()) {
+      navigation.navigate('Recipes', { query: searchQuery });
+    }
+  };
+
   return (
     <View style={styles.container}>
       <Text style={styles.headerText}>Hi, User!</Text>
@@ -31,6 +38,9 @@ export function HomeScreen({ navigation }) {
         <TextInput
           style={styles.searchInput}
           placeholder="Search here"
+          value={searchQuery}
+          onChangeText={(text) => setSearchQuery(text)}
+          onSubmitEditing={handleSearch}
         />
       </View>
 

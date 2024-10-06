@@ -19,7 +19,7 @@ export function RecipeDetailsScreen({ route,navigation }) {
   }, [recipeId, dispatch]);
 
   if (loading) {
-  <Button onPress={() => navigation.goBack()} title="Dismiss" />
+  <Button onPress={() => navigation.goBack()} title="Go back" />
     return <Text>Loading ...</Text>
   }
 
@@ -27,9 +27,10 @@ export function RecipeDetailsScreen({ route,navigation }) {
   //TODO: ADD TAGS SUCH AS diet AND dishTypes, calories,price per serving etc.
   return recipe ? (
     <ScrollView style={styles.container}>
-      <Button onPress={() => navigation.goBack()} title="Dismiss" />
+      <Button onPress={() => navigation.goBack()} title="Go back" />
       <Text style={styles.title}>{recipe.title}</Text>
       <Image source={{ uri: recipe.image }} style={styles.recipeImage} />
+      <Button onPress={() => navigation.navigate('Favourites', { recipeId: recipe.id })} title="❤️" />
 
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>Ingredients</Text>

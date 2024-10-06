@@ -4,6 +4,7 @@ import { spoonacularAPIKey } from '../config/appSettings';
 export const fetchRecipeDetails = createAsyncThunk(
   'recipeDetails/fetchRecipeDetails',
   async (recipeId, thunkAPI) => {
+    console.log('spoonacularAPIKey', spoonacularAPIKey)
     const response = await fetch(
       `https://api.spoonacular.com/recipes/${recipeId}/information?apiKey=${spoonacularAPIKey}`
     );
