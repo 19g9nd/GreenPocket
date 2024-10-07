@@ -4,22 +4,35 @@ import {
   selectRecipeDetailsLoading,
 } from '../redux/recipeDetailsSlice';
 import React, { useEffect } from 'react';
-import { View, Text, Image, StyleSheet, FlatList, ScrollView,Button } from 'react-native';
+import { View, Text, Image, StyleSheet, FlatList, ScrollView, Button } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
+import { addToFavourites, removeFromFavourites, selectFavourites } from '../redux/favoutitesSlice';
 
 // @ts-ignore
-export function RecipeDetailsScreen({ route,navigation }) {
+export function RecipeDetailsScreen({ route, navigation }) {
   const { recipeId } = route.params;
   const dispatch = useDispatch();
   const recipe = useSelector(selectRecipeDetails);
   const loading = useSelector(selectRecipeDetailsLoading);
+  const favourites = useSelector(selectFavourites);
+
+  const isFavourite = favourites.some((fav) => fav.id === recipe.id);
+
+  const handleToggleFavourite = () => {
+    if (isFavourite) {
+      dispatch(removeFromFavourites({ id: recipeId }));
+    } else {
+      dispatch(addToFavourites(recipe));
+    }
+  };
+
   useEffect(() => {
     // @ts-ignore
     dispatch(fetchRecipeDetails(recipeId));
   }, [recipeId, dispatch]);
 
   if (loading) {
-  <Button onPress={() => navigation.goBack()} title="Go back" />
+    <Button onPress={() => navigation.goBack()} title="Go back" />
     return <Text>Loading ...</Text>
   }
 
@@ -30,7 +43,7 @@ export function RecipeDetailsScreen({ route,navigation }) {
       <Button onPress={() => navigation.goBack()} title="Go back" />
       <Text style={styles.title}>{recipe.title}</Text>
       <Image source={{ uri: recipe.image }} style={styles.recipeImage} />
-      <Button onPress={() => navigation.navigate('Favourites', { recipeId: recipe.id })} title="❤️" />
+      <Button onPress={() => handleToggleFavourite()} title="❤️" />
 
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>Ingredients</Text>

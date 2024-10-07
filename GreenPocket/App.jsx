@@ -7,8 +7,8 @@ import store from './src/redux/store';
 import {HomeScreen} from './src/screens/Home';
 import {DiaryScreen} from './src/screens/Diary';
 import {RecipesScreen} from './src/screens/Recipes';
-import {RecipeDetailsScreen} from './src/screens/RecipeDetails';
-
+import {FavouritesScreen} from './src/screens/Favourites';
+import {RecipeDetailsScreen} from './src/screens/RecipeDetails'
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
 
@@ -17,6 +17,7 @@ const BottomTabNavigator = () => (
     <Tab.Screen name="Home" component={HomeScreen} />
     <Tab.Screen name="Diary" component={DiaryScreen} />
     <Tab.Screen name="Recipes" component={RecipesScreen} />
+    <Tab.Screen name="Favoutites" component={FavouritesScreen} />
   </Tab.Navigator>
 );
 

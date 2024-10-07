@@ -36,7 +36,7 @@ export function RecipesScreen({ route, navigation }) {
       <Text style={styles.recipeName}>{item.title}</Text>
     </TouchableOpacity>
   );
-
+// TODO: optimise flatlist
   return (
     <View style={styles.container}>
       <Text style={styles.headerText}>{category} Recipes</Text>
