@@ -6,6 +6,6 @@ export default configureStore({
   reducer: {
     recipes: recipesReducer,
     recipeDetails: recipeDetailsReducer,
-    favourites: favouritesReducer
+    favourites: favouritesReducer,
   },
 });

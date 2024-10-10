@@ -9,6 +9,7 @@ import {DiaryScreen} from './src/screens/Diary';
 import {RecipesScreen} from './src/screens/Recipes';
 import {FavouritesScreen} from './src/screens/Favourites';
 import {RecipeDetailsScreen} from './src/screens/RecipeDetails'
+import {FilterScreen} from './src/screens/FilterScreen';
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
 
@@ -32,6 +33,7 @@ const App = () => {
             options={{ headerShown: false }}
           />
           <Stack.Screen name="RecipeDetails" component={RecipeDetailsScreen} />
+          <Stack.Screen name="Filters" component={FilterScreen} /> 
         </Stack.Navigator>
       </NavigationContainer>
     </Provider>

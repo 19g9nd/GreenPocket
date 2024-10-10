@@ -9,24 +9,29 @@ import {
   Image,
 } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
-import { fetchRecipes, selectRecipes, selectLoading } from '../redux/recipesSlice';
+import { fetchRecipes, selectRecipes, selectLoading, selectOffset, selectTotalResults, clearRecipes } from '../redux/recipesSlice';
 
-// @ts-ignore
 export function RecipesScreen({ route, navigation }) {
-  const { category, query } = route.params || {};
-
-
-
+  const { category = '', query = '' } = route.params || {};
   const dispatch = useDispatch();
   const recipes = useSelector(selectRecipes);
   const loading = useSelector(selectLoading);
+  const offset = useSelector(selectOffset);
+  const totalResults = useSelector(selectTotalResults);
 
   useEffect(() => {
-    // @ts-ignore
-    dispatch(fetchRecipes({ category, query }));
+    // Clear previous recipes and fetch new ones on category or query change
+    dispatch(clearRecipes());
+    dispatch(fetchRecipes({ category, query, offset: 0 }));
   }, [category, query, dispatch]);
 
-  // @ts-ignore
+  const loadMoreRecipes = () => {
+    // Only load more if there are still more recipes to load and not currently loading
+    if (!loading && recipes.length < totalResults) {
+      dispatch(fetchRecipes({ category, query, offset }));
+    }
+  };
+
   const renderRecipe = ({ item }) => (
     <TouchableOpacity
       style={styles.recipeItem}
@@ -36,19 +41,25 @@ export function RecipesScreen({ route, navigation }) {
       <Text style={styles.recipeName}>{item.title}</Text>
     </TouchableOpacity>
   );
-// TODO: optimise flatlist
+
   return (
     <View style={styles.container}>
-      <Text style={styles.headerText}>{category} Recipes</Text>
-      {loading ? (
+      <Text style={styles.headerText}>{category ? `${category} Recipes` : 'Recipes'}</Text>
+      <TouchableOpacity style={styles.filterButton} onPress={() => navigation.navigate('Filters')}>
+        <Text style={styles.filterButtonText}>Filter</Text>
+      </TouchableOpacity>
+      {loading && recipes.length === 0 ? (
         <ActivityIndicator size="large" color="#0000ff" />
       ) : (
         <FlatList
           data={recipes}
           renderItem={renderRecipe}
-          keyExtractor={item => item.id.toString()}
-          showsHorizontalScrollIndicator={false}
+          keyExtractor={(item) => item.id.toString()}
+          showsVerticalScrollIndicator={false}
           contentContainerStyle={styles.listContainer}
+          onEndReached={loadMoreRecipes}
+          onEndReachedThreshold={0.5}
+          ListFooterComponent={loading && recipes.length > 0 ? <ActivityIndicator size="small" color="#0000ff" /> : null}
         />
       )}
     </View>
@@ -84,5 +95,17 @@ const styles = StyleSheet.create({
     height: 100,
     borderRadius: 8,
     marginBottom: 10,
+  },
+  filterButton: {
+    backgroundColor: '#007BFF', // Blue color for button
+    padding: 10,
+    borderRadius: 5,
+    alignItems: 'center',
+    marginBottom: 10,
+  },
+  filterButtonText: {
+    color: '#FFFFFF', // White color for text
+    fontSize: 16,
+    fontWeight: 'bold',
   },
 });
