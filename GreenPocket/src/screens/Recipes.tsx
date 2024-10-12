@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   View,
   Text,
@@ -7,28 +7,41 @@ import {
   ActivityIndicator,
   TouchableOpacity,
   Image,
+  TextInput,
 } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchRecipes, selectRecipes, selectLoading, selectOffset, selectTotalResults, clearRecipes } from '../redux/recipesSlice';
+import { fetchRandomRecipeDetails } from '../redux/recipeDetailsSlice';
 
 export function RecipesScreen({ route, navigation }) {
-  const { category = '', query = '' } = route.params || {};
+  const { category = '' } = route.params || {};
   const dispatch = useDispatch();
   const recipes = useSelector(selectRecipes);
   const loading = useSelector(selectLoading);
   const offset = useSelector(selectOffset);
   const totalResults = useSelector(selectTotalResults);
+  const [searchQuery, setSearchQuery] = useState('');
 
   useEffect(() => {
-    // Clear previous recipes and fetch new ones on category or query change
-    dispatch(clearRecipes());
-    dispatch(fetchRecipes({ category, query, offset: 0 }));
-  }, [category, query, dispatch]);
+    const timer = setTimeout(() => {
+      dispatch(clearRecipes());
+      dispatch(fetchRecipes({ category, query: searchQuery, offset: 0 }));
+    }, 500);
+
+    // Clean timer when text changes
+    return () => clearTimeout(timer);
+  }, [searchQuery, category, dispatch]);
 
   const loadMoreRecipes = () => {
-    // Only load more if there are still more recipes to load and not currently loading
     if (!loading && recipes.length < totalResults) {
-      dispatch(fetchRecipes({ category, query, offset }));
+      dispatch(fetchRecipes({ category, query: searchQuery, offset }));
+    }
+  };
+
+  const handleRandomRecipe = async () => {
+    const randomRecipe = await dispatch(fetchRandomRecipeDetails()).unwrap();
+    if (randomRecipe) {
+      navigation.navigate('RecipeDetails', { recipeId: randomRecipe.id });
     }
   };
 
@@ -45,8 +58,19 @@ export function RecipesScreen({ route, navigation }) {
   return (
     <View style={styles.container}>
       <Text style={styles.headerText}>{category ? `${category} Recipes` : 'Recipes'}</Text>
+      <View style={styles.searchContainer}>
+        <TextInput
+          style={styles.searchInput}
+          placeholder="Search here"
+          value={searchQuery}
+          onChangeText={(text) => setSearchQuery(text)}
+        />
+      </View>
       <TouchableOpacity style={styles.filterButton} onPress={() => navigation.navigate('Filters')}>
         <Text style={styles.filterButtonText}>Filter</Text>
+      </TouchableOpacity>
+      <TouchableOpacity style={styles.randomButton} onPress={handleRandomRecipe}>
+        <Text style={styles.randomButtonText}>Random Recipe</Text>
       </TouchableOpacity>
       {loading && recipes.length === 0 ? (
         <ActivityIndicator size="large" color="#0000ff" />
@@ -107,5 +131,30 @@ const styles = StyleSheet.create({
     color: '#FFFFFF', // White color for text
     fontSize: 16,
     fontWeight: 'bold',
+  },
+  randomButton: {
+    backgroundColor: '#28A745', // Green color for random button
+    padding: 10,
+    borderRadius: 5,
+    alignItems: 'center',
+    marginBottom: 10,
+  },
+  randomButtonText: {
+    color: '#FFFFFF', // White color for random button text
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+  searchContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: '#ddd',
+    borderRadius: 8,
+    paddingHorizontal: 10,
+    marginBottom: 20,
+  },
+  searchInput: {
+    flex: 1,
+    height: 40,
   },
 });

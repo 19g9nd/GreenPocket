@@ -1,22 +1,16 @@
-import {
-  fetchRecipeDetails,
-  selectRecipeDetails,
-  selectRecipeDetailsLoading,
-} from '../redux/recipeDetailsSlice';
 import React, { useEffect } from 'react';
-import { View, Text, Image, StyleSheet, FlatList, ScrollView, Button } from 'react-native';
+import { View, Text, Image, StyleSheet, FlatList, TouchableOpacity } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
+import { fetchRecipeDetails, selectRecipeDetails, selectRecipeDetailsLoading } from '../redux/recipeDetailsSlice';
 import { addToFavourites, removeFromFavourites, selectFavourites } from '../redux/favoutitesSlice';
 
-// @ts-ignore
 export function RecipeDetailsScreen({ route, navigation }) {
   const { recipeId } = route.params;
   const dispatch = useDispatch();
   const recipe = useSelector(selectRecipeDetails);
   const loading = useSelector(selectRecipeDetailsLoading);
   const favourites = useSelector(selectFavourites);
-
-  const isFavourite = favourites.some((fav) => fav.id === recipe.id);
+  const isFavourite = favourites.some((fav) => fav.id === recipeId);
 
   const handleToggleFavourite = () => {
     if (isFavourite) {
@@ -27,62 +21,85 @@ export function RecipeDetailsScreen({ route, navigation }) {
   };
 
   useEffect(() => {
-    // @ts-ignore
     dispatch(fetchRecipeDetails(recipeId));
   }, [recipeId, dispatch]);
 
   if (loading) {
-    <Button onPress={() => navigation.goBack()} title="Go back" />
-    return <Text>Loading ...</Text>
+    return <Text>Loading...</Text>;
   }
 
+  const NutrientCircle = ({ label, value }) => (
+    <View style={styles.nutrientCircle}>
+      <Text style={styles.nutrientValue}>{value}</Text>
+      <Text style={styles.nutrientLabel}>{label}</Text>
+    </View>
+  );
 
-  //TODO: ADD TAGS SUCH AS diet AND dishTypes, calories,price per serving etc.
+  const renderIngredients = ({ item }) => (
+    <View style={styles.ingredientItem}>
+      <Text>{item.original}</Text>
+    </View>
+  );
+
+  const renderInstructions = () => {
+    return recipe.analyzedInstructions && recipe.analyzedInstructions.length > 0 ? (
+      recipe.analyzedInstructions[0].steps.map((step) => (
+        <Text key={step.number} style={styles.instructionText}>
+          {step.number}. {step.step}
+        </Text>
+      ))
+    ) : (
+      <Text>No instructions provided.</Text>
+    );
+  };
+
   return recipe ? (
-    <ScrollView style={styles.container}>
-      <Button onPress={() => navigation.goBack()} title="Go back" />
-      <Text style={styles.title}>{recipe.title}</Text>
-      <Image source={{ uri: recipe.image }} style={styles.recipeImage} />
-      <Button onPress={() => handleToggleFavourite()} title="❤️" />
+    <FlatList
+      ListHeaderComponent={
+        <View style={styles.headerContainer}>
+          <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
+            <Text style={styles.backButtonText}>Go Back</Text>
+          </TouchableOpacity>
+          
+          <Text style={styles.title}>{recipe.title}</Text>
+          <Image source={{ uri: recipe.image }} style={styles.recipeImage} />
+          
+          <View style={styles.favButtonContainer}>
+            <TouchableOpacity onPress={handleToggleFavourite} style={styles.favButton}>
+              <Text style={styles.favButtonText}>{isFavourite ? '❤️ Remove from Favourites' : '🤍 Add to Favourites'}</Text>
+            </TouchableOpacity>
+          </View>
 
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Ingredients</Text>
-        <FlatList
-          data={recipe.extendedIngredients}
-          keyExtractor={(item) => item.id.toString()}
-          renderItem={({ item }) => (
-            <View style={styles.ingredientItem}>
-              <Text>{item.original}</Text>
-            </View>
-          )}
-        />
-      </View>
+          <View style={styles.nutrientsContainer}>
+            <NutrientCircle label="Calories" value={recipe.calories || 'N/A'} />
+            <NutrientCircle label="Protein" value={`${recipe.protein || 'N/A'}g`} />
+            <NutrientCircle label="Fat" value={`${recipe.fat || 'N/A'}g`} />
+            <NutrientCircle label="Carbs" value={`${recipe.carbs || 'N/A'}g`} />
+          </View>
 
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Instructions</Text>
-        {recipe.analyzedInstructions && recipe.analyzedInstructions.length > 0 ? (
-          recipe.analyzedInstructions[0].steps.map((step) => (
-            <Text key={step.number} style={styles.instructionText}>
-              {step.number}. {step.step}
-            </Text>
-          ))
-        ) : (
-          <Text>No instructions provided.</Text>
-        )}
-      </View>
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>Ingredients</Text>
+          </View>
+        </View>
+      }
+      data={recipe.extendedIngredients}
+      keyExtractor={(item) => item.id.toString()}
+      renderItem={renderIngredients}
+      ListFooterComponent={
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Instructions</Text>
+          {renderInstructions()}
 
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Summary</Text>
-        <Text>{recipe.summary.replace(/<\/?b>/g, '')}</Text>
-      </View>
-
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Additional Information</Text>
-        <Text>Ready in Minutes: {recipe.readyInMinutes}</Text>
-        <Text>Servings: {recipe.servings}</Text>
-        <Text>Health Score: {recipe.healthScore}</Text>
-      </View>
-    </ScrollView>
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>Additional Info</Text>
+            <Text>Price per Serving: ${recipe.pricePerServing}</Text>
+            <Text>Ready in Minutes: {recipe.readyInMinutes}</Text>
+            <Text>Servings: {recipe.servings}</Text>
+            <Text>Health Score: {recipe.healthScore}</Text>
+          </View>
+        </View>
+      }
+    />
   ) : (
     <Text>Recipe not found</Text>
   );
@@ -92,11 +109,22 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 16,
-    backgroundColor: '#fff',
+    backgroundColor: '#F8F8F8',
+  },
+  headerContainer: {
+    paddingBottom: 16,
+  },
+  backButton: {
+    marginBottom: 10,
+  },
+  backButtonText: {
+    fontSize: 16,
+    color: '#007BFF',
   },
   title: {
-    fontSize: 24,
+    fontSize: 28,
     fontWeight: 'bold',
+    color: '#333',
     marginBottom: 10,
   },
   recipeImage: {
@@ -105,6 +133,41 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     marginBottom: 20,
   },
+  favButtonContainer: {
+    alignItems: 'center',
+    marginBottom: 20,
+  },
+  favButton: {
+    backgroundColor: '#FF6F61',
+    padding: 10,
+    borderRadius: 5,
+  },
+  favButtonText: {
+    color: '#FFF',
+    fontSize: 16,
+  },
+  nutrientsContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    marginBottom: 20,
+  },
+  nutrientCircle: {
+    width: 80,
+    height: 80,
+    borderRadius: 40,
+    backgroundColor: '#FFEBEE',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  nutrientValue: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#333',
+  },
+  nutrientLabel: {
+    fontSize: 12,
+    color: '#777',
+  },
   section: {
     marginBottom: 20,
   },
@@ -112,6 +175,7 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: '600',
     marginBottom: 10,
+    color: '#333',
   },
   ingredientItem: {
     marginBottom: 5,
@@ -119,5 +183,6 @@ const styles = StyleSheet.create({
   instructionText: {
     fontSize: 16,
     marginBottom: 5,
+    color: '#555',
   },
 });

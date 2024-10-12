@@ -14,6 +14,17 @@ export const fetchRecipeDetails = createAsyncThunk(
   }
 );
 
+export const fetchRandomRecipeDetails = createAsyncThunk(
+  'recipeDetails/fetchRandomRecipeDetails',
+  async (thunkAPI) => {
+    const response = await fetch(
+      `https://api.spoonacular.com/recipes/random?number=1&apiKey=${spoonacularAPIKey}`
+    );
+    const data = await response.json();
+    return data.recipes[0]; // Random recipes come in an array, select the first one
+  }
+);
+
 const recipeDetailsSlice = createSlice({
   name: 'recipeDetails',
   initialState: {
@@ -33,6 +44,18 @@ const recipeDetailsSlice = createSlice({
         state.loading = false;
       })
       .addCase(fetchRecipeDetails.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.error.message;
+      })
+      .addCase(fetchRandomRecipeDetails.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(fetchRandomRecipeDetails.fulfilled, (state, action) => {
+        state.recipe = action.payload;
+        state.loading = false;
+      })
+      .addCase(fetchRandomRecipeDetails.rejected, (state, action) => {
         state.loading = false;
         state.error = action.error.message;
       });

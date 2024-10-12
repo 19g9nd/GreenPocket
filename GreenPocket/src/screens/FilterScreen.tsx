@@ -1,9 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, Button, StyleSheet, TouchableOpacity, TextInput, ScrollView } from 'react-native';
+import { View, Text, TouchableOpacity, TextInput, ScrollView, StyleSheet } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
 import { clearFilters, setFilters, fetchRecipes } from '../redux/recipesSlice';
 
-//TODO: Fix not working with search params,style 
 export const FilterScreen = ({ navigation }) => {
   const dispatch = useDispatch();
   const filters = useSelector((state) => state.recipes);
@@ -11,20 +10,28 @@ export const FilterScreen = ({ navigation }) => {
   const [selectedCategories, setSelectedCategories] = useState(filters.category || '');
   const [selectedDiets, setSelectedDiets] = useState(filters.diets || []);
   const [selectedCuisine, setSelectedCuisine] = useState(filters.cuisine || '');
+  const [selectedIntolerances, setSelectedIntolerances] = useState(filters.intolerances || []);
+  const [selectedMealType, setSelectedMealType] = useState(filters.mealType || '');
+  const [maxReadyTime, setMaxReadyTime] = useState(filters.maxReadyTime || 0);
   const [selectedCalories, setSelectedCalories] = useState(filters.calories || [0, 0]);
 
   const [filtersUpdated, setFiltersUpdated] = useState(false);
 
+  // Trigger filter update check when any filter changes
   useEffect(() => {
     setFiltersUpdated(true);
-  }, [selectedCategories, selectedDiets, selectedCuisine, selectedCalories]);
+  }, [selectedCategories, selectedDiets, selectedCuisine, selectedIntolerances, selectedMealType, maxReadyTime, selectedCalories]);
 
+  // Apply filters and fetch recipes
   const handleApplyFilters = () => {
     if (filtersUpdated) {
       dispatch(setFilters({
         category: selectedCategories,
         diets: selectedDiets,
         cuisine: selectedCuisine,
+        intolerances: selectedIntolerances,
+        mealType: selectedMealType,
+        maxReadyTime, //  TODO: move to redux 
         calories: selectedCalories,
       }));
 
@@ -32,6 +39,9 @@ export const FilterScreen = ({ navigation }) => {
         category: selectedCategories,
         diets: selectedDiets,
         cuisine: selectedCuisine,
+        intolerances: selectedIntolerances,
+        mealType: selectedMealType,
+        maxReadyTime,
         calories: selectedCalories,
       }));
 
@@ -45,15 +55,72 @@ export const FilterScreen = ({ navigation }) => {
   const categoryOptions = [
     { id: "0", text: "Breakfast" },
     { id: "1", text: "Lunch" },
-    { id: "2", text: "Dinner" }
+    { id: "2", text: "Dinner" },
+    { id: "3", text: "Salads" },
+    { id: "4", text: "Drinks" },
+    { id: "5", text: "Snacks" },
+    { id: "6", text: "Appetizers" },
+    { id: "7", text: "Desserts" },
   ];
 
   const dietOptions = [
     { id: "0", text: "Vegan" },
+    { id: "5", text: "Ovo-Vegetarian" },
     { id: "1", text: "Vegetarian" },
-    { id: "2", text: "Gluten-Free" }
+    { id: "2", text: "Gluten Free" },
+    { id: "3", text: "Ketogenic" },
+    { id: "4", text: "Lacto-Vegetarian" },
+    { id: "6", text: "Pescetarian" },
+    { id: "7", text: "Paleo" },
+    { id: "8", text: "Primal" },
+    { id: "9", text: "Low FODMAP" },
+    { id: "10", text: "Whole30" }
   ];
 
+
+  const cuisineOptions = [
+    { id: "0", text: "African" },
+    { id: "1", text: "American" },
+    { id: "2", text: "British" },
+    { id: "3", text: "Cajun" },
+    { id: "4", text: "Caribbean" },
+    { id: "5", text: "Chinese" },
+    { id: "6", text: "Eastern European" },
+    { id: "7", text: "European" },
+    { id: "8", text: "French" },
+    { id: "9", text: "German" },
+    { id: "10", text: "Greek" },
+    { id: "11", text: "Indian" },
+    { id: "12", text: "Irish" },
+    { id: "13", text: "Italian" },
+    { id: "14", text: "Japanese" },
+    { id: "15", text: "Jewish" },
+    { id: "16", text: "Korean" },
+    { id: "17", text: "Latin American" },
+    { id: "18", text: "Mediterranean" },
+    { id: "19", text: "Mexican" },
+    { id: "20", text: "Middle Eastern" },
+    { id: "21", text: "Nordic" },
+    { id: "22", text: "Southern" },
+    { id: "23", text: "Spanish" },
+    { id: "24", text: "Thai" },
+    { id: "25", text: "Vietnamese" }
+  ];
+
+  const intoleranceOptions = [
+    { id: "0", text: "Dairy" },
+    { id: "1", text: "Peanut" },
+    { id: "2", text: "Soy" },
+    { id: "3", text: "Wheat" },
+  ];
+
+  const mealTypeOptions = [
+    { id: "0", text: "Main Course" },
+    { id: "1", text: "Side Dish" },
+    { id: "2", text: "Dessert" },
+  ];
+
+  // Reusable function for rendering options (for both single and multiple selections)
   const renderOption = (option, selectedItems, setSelectedItems, singleSelection = false) => {
     const isSelected = singleSelection
       ? selectedItems === option.text.toLowerCase()
@@ -66,7 +133,7 @@ export const FilterScreen = ({ navigation }) => {
         onPress={() => {
           const value = option.text.toLowerCase();
           if (singleSelection) {
-            setSelectedItems(value); // Single selection for categories
+            setSelectedItems(value); // Single selection for categories and meal type
           } else {
             setSelectedItems((prev) =>
               prev.includes(value)
@@ -101,16 +168,31 @@ export const FilterScreen = ({ navigation }) => {
         )}
       </View>
 
-      {/* Cuisine Input */}
-      <Text style={styles.sectionTitle}>Cuisine</Text>
-      <TextInput
-        style={styles.input}
-        placeholder="Enter Cuisine"
-        value={selectedCuisine}
-        onChangeText={setSelectedCuisine}
-      />
+      {/* Intolerances Filter */}
+      <Text style={styles.sectionTitle}>Intolerances</Text>
+      <View style={styles.optionsContainer}>
+        {intoleranceOptions.map((option) =>
+          renderOption(option, selectedIntolerances, setSelectedIntolerances)
+        )}
+      </View>
 
-      {/* Calories Input */}
+      {/* Meal Type Filter */}
+      <Text style={styles.sectionTitle}>Meal Type</Text>
+      <View style={styles.optionsContainer}>
+        {mealTypeOptions.map((option) =>
+          renderOption(option, selectedMealType, setSelectedMealType, true)
+        )}
+      </View>
+
+      {/* Cuisine Filter (only available cuisines) */}
+      <Text style={styles.sectionTitle}>Cuisine</Text>
+      <View style={styles.optionsContainer}>
+        {cuisineOptions.map((option) =>
+          renderOption(option, selectedCuisine, setSelectedCuisine, true)
+        )}
+      </View>
+
+      {/* Calories Range Input */}
       <Text style={styles.sectionTitle}>Calories Range</Text>
       <View style={styles.caloriesContainer}>
         <TextInput
@@ -136,6 +218,15 @@ export const FilterScreen = ({ navigation }) => {
         />
       </View>
 
+      {/* Max Ready Time Filter */}
+      <Text style={styles.sectionTitle}>Max Ready Time (minutes)</Text>
+      <TextInput
+        style={styles.input}
+        placeholder="e.g. 30"
+        keyboardType="numeric"
+        value={maxReadyTime !== 0 ? maxReadyTime.toString() : ''}
+        onChangeText={(time) => setMaxReadyTime(parseInt(time) || 0)}
+      />
 
       {/* Apply and Clear Buttons */}
       <TouchableOpacity style={styles.applyButton} onPress={handleApplyFilters}>
@@ -147,6 +238,9 @@ export const FilterScreen = ({ navigation }) => {
           setSelectedCategories('');
           setSelectedDiets([]);
           setSelectedCuisine('');
+          setSelectedIntolerances([]);
+          setSelectedMealType('');
+          setMaxReadyTime(0);
           setSelectedCalories([0, 0]);
           dispatch(clearFilters());
         }}
@@ -203,7 +297,7 @@ const styles = StyleSheet.create({
     marginVertical: 5,
   },
   selectedOptionButton: {
-    backgroundColor: '#4CAF50', // Highlight for selected options
+    backgroundColor: '#4CAF50',
   },
   optionText: {
     fontSize: 16,
@@ -215,14 +309,14 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
   },
   applyButton: {
-    backgroundColor: '#007BFF', // Apply button color
+    backgroundColor: '#007BFF',
     padding: 15,
     borderRadius: 5,
     alignItems: 'center',
     marginVertical: 10,
   },
   clearButton: {
-    backgroundColor: '#FF6347', // Clear button color (tomato red)
+    backgroundColor: '#FF6347',
     padding: 15,
     borderRadius: 5,
     alignItems: 'center',

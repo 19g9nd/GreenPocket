@@ -1,50 +1,49 @@
-import React, {useState} from 'react';
-import { Text, TextInput, View, StyleSheet, FlatList, TouchableOpacity } from 'react-native';
+import React from 'react';
+import { Text, FlatList, TouchableOpacity, View, StyleSheet } from 'react-native';
 
-// @ts-ignore
 export function HomeScreen({ navigation }) {
-  const categories = ['Breakfast', 'Lunch', 'Salads', 'Drinks', 'Dinner', 'Desserts'];
-  const services = ['Menu for week', 'Product list', 'Find recipe'];
-  const [searchQuery, setSearchQuery] = useState('');
-  // @ts-ignore
+  // Categories and their emojis
+  const categories = [
+    { name: 'Breakfast', emoji: '🌅' }, 
+    { name: 'Lunch', emoji: '🍎' }, 
+    { name: 'Salads', emoji: '🥗' }, 
+    { name: 'Drinks', emoji: '🍫' }, 
+    { name: 'Dinner', emoji: '🍔' }, 
+    { name: 'Desserts', emoji: '🍨' }
+  ];
+
+  // Services and their emojis
+  const services = [
+    { name: 'Menu for week', emoji: '📅' }, 
+    { name: 'Product list', emoji: '🛒' }, 
+    { name: 'Find recipe', emoji: '🔍' }
+  ];
+
+  // Category item rendering
   const renderCategory = ({ item }) => (
     <TouchableOpacity
       style={styles.categoryItem}
-      onPress={() => navigation.navigate('Recipes', { category: item })}
+      onPress={() => navigation.navigate('Recipes', { category: item.name })}
     >
-      <Text style={styles.categoryText}>{item}</Text>
+      <Text style={styles.emoji}>{item.emoji}</Text>
+      <Text style={styles.categoryText}>{item.name}</Text>
     </TouchableOpacity>
   );
 
-  // @ts-ignore
+  // Service item rendering
   const renderService = ({ item }) => (
     <TouchableOpacity style={styles.serviceItem}>
-      <Text style={styles.serviceText}>{item}</Text>
+      <Text style={styles.emoji}>{item.emoji}</Text>
+      <Text style={styles.serviceText}>{item.name}</Text>
     </TouchableOpacity>
   );
-
-  const handleSearch = () => {
-    if (searchQuery.trim()) {
-      navigation.navigate('Recipes', { query: searchQuery });
-    }
-  };
 
   return (
     <View style={styles.container}>
       <Text style={styles.headerText}>Hi, User!</Text>
       <Text style={styles.subHeaderText}>Recipes</Text>
 
-      <View style={styles.searchContainer}>
-        <TextInput
-          style={styles.searchInput}
-          placeholder="Search here"
-          value={searchQuery}
-          onChangeText={(text) => setSearchQuery(text)}
-          onSubmitEditing={handleSearch}
-        />
-      </View>
-
-      <Text style={styles.sectionHeader}>Categories</Text>
+      {/* Categories List */}
       <FlatList
         data={categories}
         renderItem={renderCategory}
@@ -55,6 +54,8 @@ export function HomeScreen({ navigation }) {
       />
 
       <Text style={styles.sectionHeader}>Services</Text>
+
+      {/* Services List */}
       <FlatList
         data={services}
         renderItem={renderService}
@@ -71,57 +72,58 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 20,
-    backgroundColor: '#fff',
+    backgroundColor: '#FDFFEC',
   },
   headerText: {
     fontSize: 24,
     fontWeight: 'bold',
+    color: '#3D3D3D',
     marginBottom: 10,
   },
   subHeaderText: {
     fontSize: 18,
+    color: '#3D3D3D',
     marginBottom: 20,
-  },
-  searchContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    borderWidth: 1,
-    borderColor: '#ddd',
-    borderRadius: 8,
-    paddingHorizontal: 10,
-    marginBottom: 20,
-  },
-  searchInput: {
-    flex: 1,
-    height: 40,
   },
   sectionHeader: {
     fontSize: 18,
     fontWeight: 'bold',
     marginTop: 20,
     marginBottom: 10,
+    color: '#3D3D3D',
   },
   listContainer: {
     paddingBottom: 10,
   },
   categoryItem: {
-    backgroundColor: '#f0f0f0',
+    backgroundColor: '#F1F5BD', // Light green background for categories
     padding: 15,
-    borderRadius: 8,
+    borderRadius: 12,
     marginRight: 10,
+    alignItems: 'center',
+    flexDirection: 'row',
   },
   categoryText: {
     fontSize: 16,
     fontWeight: '500',
+    marginLeft: 10,
+    color: '#3D3D3D',
   },
   serviceItem: {
-    backgroundColor: '#e0e0e0',
+    backgroundColor: '#F1F4BD',
     padding: 15,
-    borderRadius: 8,
+    borderRadius: 12,
     marginRight: 10,
+    alignItems: 'center',
+    flexDirection: 'row',
   },
   serviceText: {
     fontSize: 16,
     fontWeight: '500',
+    marginLeft: 10,
+    color: '#3D3D3D',
+  },
+  emoji: {
+    fontSize: 30, // Increased font size for emojis to make them prominent
   },
 });

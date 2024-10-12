@@ -14,11 +14,18 @@ const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
 
 const BottomTabNavigator = () => (
-  <Tab.Navigator screenOptions={{ headerShown: false }}>
+  <Tab.Navigator
+    screenOptions={{
+      headerShown: false,
+      tabBarStyle: { backgroundColor: 'black' },
+      tabBarActiveTintColor: 'white', 
+      tabBarInactiveTintColor: 'gray',
+    }}
+  >
     <Tab.Screen name="Home" component={HomeScreen} />
     <Tab.Screen name="Diary" component={DiaryScreen} />
     <Tab.Screen name="Recipes" component={RecipesScreen} />
-    <Tab.Screen name="Favoutites" component={FavouritesScreen} />
+    <Tab.Screen name="Favourites" component={FavouritesScreen} />
   </Tab.Navigator>
 );
 
@@ -30,9 +37,9 @@ const App = () => {
           <Stack.Screen
             name="BottomTab"
             component={BottomTabNavigator}
-            options={{ headerShown: false }}
+            options={{ headerShown: false}}
           />
-          <Stack.Screen name="RecipeDetails" component={RecipeDetailsScreen} />
+          <Stack.Screen name="RecipeDetails" component={RecipeDetailsScreen} options={{headerShown: false}} />
           <Stack.Screen name="Filters" component={FilterScreen} /> 
         </Stack.Navigator>
       </NavigationContainer>
