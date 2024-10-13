@@ -31,7 +31,7 @@ export const FilterScreen = ({ navigation }) => {
         cuisine: selectedCuisine,
         intolerances: selectedIntolerances,
         mealType: selectedMealType,
-        maxReadyTime, //  TODO: move to redux 
+        maxReadyTime,
         calories: selectedCalories,
       }));
 

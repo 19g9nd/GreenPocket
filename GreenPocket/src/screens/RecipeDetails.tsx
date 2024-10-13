@@ -3,7 +3,7 @@ import { View, Text, Image, StyleSheet, FlatList, TouchableOpacity } from 'react
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchRecipeDetails, selectRecipeDetails, selectRecipeDetailsLoading } from '../redux/recipeDetailsSlice';
 import { addToFavourites, removeFromFavourites, selectFavourites } from '../redux/favoutitesSlice';
-
+//TODO: fix price per serving, show vitamins
 export function RecipeDetailsScreen({ route, navigation }) {
   const { recipeId } = route.params;
   const dispatch = useDispatch();
@@ -60,21 +60,33 @@ export function RecipeDetailsScreen({ route, navigation }) {
           <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
             <Text style={styles.backButtonText}>Go Back</Text>
           </TouchableOpacity>
-          
+
           <Text style={styles.title}>{recipe.title}</Text>
           <Image source={{ uri: recipe.image }} style={styles.recipeImage} />
-          
+
           <View style={styles.favButtonContainer}>
             <TouchableOpacity onPress={handleToggleFavourite} style={styles.favButton}>
-              <Text style={styles.favButtonText}>{isFavourite ? '❤️ Remove from Favourites' : '🤍 Add to Favourites'}</Text>
+              <Text style={styles.favButtonText}>{isFavourite ? '💔 Remove from Favourites' : '🤍 Add to Favourites'}</Text>
             </TouchableOpacity>
           </View>
 
           <View style={styles.nutrientsContainer}>
-            <NutrientCircle label="Calories" value={recipe.calories || 'N/A'} />
-            <NutrientCircle label="Protein" value={`${recipe.protein || 'N/A'}g`} />
-            <NutrientCircle label="Fat" value={`${recipe.fat || 'N/A'}g`} />
-            <NutrientCircle label="Carbs" value={`${recipe.carbs || 'N/A'}g`} />
+            <NutrientCircle 
+              label="Calories" 
+              value={`${recipe.nutrition ? recipe.nutrition.nutrients.find(n => n.name === 'Calories')?.amount.toFixed(0) : 'N/A'} kcal`} 
+            />
+            <NutrientCircle 
+              label="Protein" 
+              value={`${recipe.nutrition ? recipe.nutrition.nutrients.find(n => n.name === 'Protein')?.amount.toFixed(0) : 'N/A'} g`} 
+            />
+            <NutrientCircle 
+              label="Fat" 
+              value={`${recipe.nutrition ? recipe.nutrition.nutrients.find(n => n.name === 'Fat')?.amount.toFixed(0) : 'N/A'} g`} 
+            />
+            <NutrientCircle 
+              label="Carbs" 
+              value={`${recipe.nutrition ? recipe.nutrition.nutrients.find(n => n.name === 'Carbohydrates')?.amount.toFixed(0) : 'N/A'} g`} 
+            />
           </View>
 
           <View style={styles.section}>
@@ -184,5 +196,9 @@ const styles = StyleSheet.create({
     fontSize: 16,
     marginBottom: 5,
     color: '#555',
+  },
+  link: {
+    color: '#007BFF',
+    textDecorationLine: 'underline',
   },
 });

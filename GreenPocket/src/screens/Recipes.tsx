@@ -78,7 +78,7 @@ export function RecipesScreen({ route, navigation }) {
         <FlatList
           data={recipes}
           renderItem={renderRecipe}
-          keyExtractor={(item) => item.id.toString()}
+          keyExtractor={(item, index) => `${item.id}-${index}`} 
           showsVerticalScrollIndicator={false}
           contentContainerStyle={styles.listContainer}
           onEndReached={loadMoreRecipes}

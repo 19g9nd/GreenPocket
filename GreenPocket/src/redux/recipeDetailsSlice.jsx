@@ -6,7 +6,7 @@ export const fetchRecipeDetails = createAsyncThunk(
   async (recipeId, thunkAPI) => {
     console.log('spoonacularAPIKey', spoonacularAPIKey)
     const response = await fetch(
-      `https://api.spoonacular.com/recipes/${recipeId}/information?apiKey=${spoonacularAPIKey}`
+      `https://api.spoonacular.com/recipes/${recipeId}/information?apiKey=${spoonacularAPIKey}&includeNutrition=true`
     );
     const data = await response.json();
     console.log(data);

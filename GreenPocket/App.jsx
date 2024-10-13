@@ -3,15 +3,16 @@ import {NavigationContainer} from '@react-navigation/native';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import {Provider} from 'react-redux';
-import store from './src/redux/store';
 import {HomeScreen} from './src/screens/Home';
 import {DiaryScreen} from './src/screens/Diary';
 import {RecipesScreen} from './src/screens/Recipes';
 import {FavouritesScreen} from './src/screens/Favourites';
 import {RecipeDetailsScreen} from './src/screens/RecipeDetails'
 import {FilterScreen} from './src/screens/FilterScreen';
+import {PersistGate} from 'redux-persist/integration/react';
+import {persistor, store} from './src/redux/store';
 const Stack = createNativeStackNavigator();
-const Tab = createBottomTabNavigator();
+const Tab = createBottomTabNavigator()
 
 const BottomTabNavigator = () => (
   <Tab.Navigator
@@ -32,6 +33,7 @@ const BottomTabNavigator = () => (
 const App = () => {
   return (
     <Provider store={store}>
+      <PersistGate persistor={persistor}>
       <NavigationContainer>
         <Stack.Navigator>
           <Stack.Screen
@@ -43,6 +45,8 @@ const App = () => {
           <Stack.Screen name="Filters" component={FilterScreen} /> 
         </Stack.Navigator>
       </NavigationContainer>
+
+      </PersistGate>
     </Provider>
   );
 };
