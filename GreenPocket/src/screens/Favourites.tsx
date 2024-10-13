@@ -4,6 +4,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { removeFromFavourites, selectFavourites } from '../redux/favoutitesSlice';
 import { selectRecipeDetailsLoading } from '../redux/recipeDetailsSlice';
 import { useNavigation } from '@react-navigation/native';
+import { Colors } from '../components/colors'; 
 
 export function FavouritesScreen() {
   const favourites = useSelector(selectFavourites);
@@ -39,7 +40,8 @@ export function FavouritesScreen() {
     <View style={styles.container}>
       <FlatList
         data={favourites}
-        keyExtractor={(item) => item.id.toString()}
+        showsVerticalScrollIndicator={false} 
+        keyExtractor={(item, index) => `${item.original}-${index}`}
         renderItem={({ item }) => (
           <View style={styles.recipeItem}>
             <TouchableOpacity onPress={() => handleRecipePress(item.id)} style={styles.touchableArea}>
@@ -68,7 +70,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 20,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: Colors.background,
   },
   loadingContainer: {
     flex: 1,
@@ -85,7 +87,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     borderRadius: 15,
-    backgroundColor: '#F8F8F8',
+    backgroundColor: Colors.recipeItem,
     padding: 15,
     shadowColor: '#000',
     shadowOffset: {
@@ -108,11 +110,11 @@ const styles = StyleSheet.create({
   recipeTitle: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#333',
+    color: Colors.textPrimary, 
   },
   recipeDescription: {
     fontSize: 12,
-    color: '#666',
+    color: Colors.textSecondary, 
   },
   recipeImage: {
     width: 80,
@@ -128,6 +130,6 @@ const styles = StyleSheet.create({
   },
   heartText: {
     fontSize: 24,
-    color: '#FF6F61',
+    color: Colors.heartButton, 
   },
 });

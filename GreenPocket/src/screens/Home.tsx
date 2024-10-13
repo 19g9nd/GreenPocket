@@ -1,25 +1,23 @@
 import React from 'react';
 import { Text, FlatList, TouchableOpacity, View, StyleSheet } from 'react-native';
+import { Colors } from '../components/colors';
 
 export function HomeScreen({ navigation }) {
-  // Categories and their emojis
   const categories = [
-    { name: 'Breakfast', emoji: '🌅' }, 
-    { name: 'Lunch', emoji: '🍎' }, 
-    { name: 'Salads', emoji: '🥗' }, 
-    { name: 'Drinks', emoji: '🍫' }, 
-    { name: 'Dinner', emoji: '🍔' }, 
-    { name: 'Desserts', emoji: '🍨' }
+    { name: 'Breakfast', emoji: '🌅' },
+    { name: 'Lunch', emoji: '🍎' },
+    { name: 'Salads', emoji: '🥗' },
+    { name: 'Drinks', emoji: '🍫' },
+    { name: 'Dinner', emoji: '🍔' },
+    { name: 'Desserts', emoji: '🍨' },
   ];
 
-  // Services and their emojis
   const services = [
-    { name: 'Menu for week', emoji: '📅' }, 
-    { name: 'Product list', emoji: '🛒' }, 
-    { name: 'Find recipe', emoji: '🔍' }
+    { name: 'Menu for week', emoji: '📅' },
+    { name: 'Product list', emoji: '🛒' },
+    { name: 'Find recipe', emoji: '🔍' },
   ];
 
-  // Category item rendering
   const renderCategory = ({ item }) => (
     <TouchableOpacity
       style={styles.categoryItem}
@@ -30,7 +28,6 @@ export function HomeScreen({ navigation }) {
     </TouchableOpacity>
   );
 
-  // Service item rendering
   const renderService = ({ item }) => (
     <TouchableOpacity style={styles.serviceItem}>
       <Text style={styles.emoji}>{item.emoji}</Text>
@@ -43,11 +40,10 @@ export function HomeScreen({ navigation }) {
       <Text style={styles.headerText}>Hi, User!</Text>
       <Text style={styles.subHeaderText}>Recipes</Text>
 
-      {/* Categories List */}
       <FlatList
         data={categories}
         renderItem={renderCategory}
-        keyExtractor={(item, index) => index.toString()}
+        keyExtractor={(item, index) => `${item.original}-${index}`}
         horizontal
         showsHorizontalScrollIndicator={false}
         contentContainerStyle={styles.listContainer}
@@ -55,11 +51,10 @@ export function HomeScreen({ navigation }) {
 
       <Text style={styles.sectionHeader}>Services</Text>
 
-      {/* Services List */}
       <FlatList
         data={services}
         renderItem={renderService}
-        keyExtractor={(item, index) => index.toString()}
+        keyExtractor={(item, index) => `${item.original}-${index}`}
         horizontal
         showsHorizontalScrollIndicator={false}
         contentContainerStyle={styles.listContainer}
@@ -72,17 +67,17 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 20,
-    backgroundColor: '#FDFFEC',
+    backgroundColor: Colors.background,
   },
   headerText: {
     fontSize: 24,
     fontWeight: 'bold',
-    color: '#3D3D3D',
+    color: Colors.textPrimary,
     marginBottom: 10,
   },
   subHeaderText: {
     fontSize: 18,
-    color: '#3D3D3D',
+    color: Colors.textPrimary,
     marginBottom: 20,
   },
   sectionHeader: {
@@ -90,13 +85,13 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     marginTop: 20,
     marginBottom: 10,
-    color: '#3D3D3D',
+    color: Colors.textPrimary,
   },
   listContainer: {
     paddingBottom: 10,
   },
   categoryItem: {
-    backgroundColor: '#F1F5BD', // Light green background for categories
+    backgroundColor: Colors.categoryItem,
     padding: 15,
     borderRadius: 12,
     marginRight: 10,
@@ -107,10 +102,10 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '500',
     marginLeft: 10,
-    color: '#3D3D3D',
+    color: Colors.textPrimary,
   },
   serviceItem: {
-    backgroundColor: '#F1F4BD',
+    backgroundColor: Colors.serviceItem,
     padding: 15,
     borderRadius: 12,
     marginRight: 10,
@@ -121,9 +116,9 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '500',
     marginLeft: 10,
-    color: '#3D3D3D',
+    color: Colors.textPrimary,
   },
   emoji: {
-    fontSize: 30, // Increased font size for emojis to make them prominent
+    fontSize: 30,
   },
 });

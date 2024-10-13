@@ -1,9 +1,12 @@
-import React, { useEffect } from 'react';
-import { View, Text, Image, StyleSheet, FlatList, TouchableOpacity } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { View, Text, Image, StyleSheet, FlatList, TouchableOpacity, TextInput } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchRecipeDetails, selectRecipeDetails, selectRecipeDetailsLoading } from '../redux/recipeDetailsSlice';
 import { addToFavourites, removeFromFavourites, selectFavourites } from '../redux/favoutitesSlice';
-//TODO: fix price per serving, show vitamins
+import { Colors } from '../components/colors';
+import BackIcon from '../assets/icons/arrowBack';
+import SvgIcon from '../components/SvgIcon';
+
 export function RecipeDetailsScreen({ route, navigation }) {
   const { recipeId } = route.params;
   const dispatch = useDispatch();
@@ -11,6 +14,10 @@ export function RecipeDetailsScreen({ route, navigation }) {
   const loading = useSelector(selectRecipeDetailsLoading);
   const favourites = useSelector(selectFavourites);
   const isFavourite = favourites.some((fav) => fav.id === recipeId);
+
+  const [unitSystem, setUnitSystem] = useState('metric'); 
+  const [portionSize, setPortionSize] = useState(recipe?.servings || 1); // Default portion size to recipe servings
+  const [showAdditionalVitamins, setShowAdditionalVitamins] = useState(false); // Collapsible section
 
   const handleToggleFavourite = () => {
     if (isFavourite) {
@@ -25,21 +32,27 @@ export function RecipeDetailsScreen({ route, navigation }) {
   }, [recipeId, dispatch]);
 
   if (loading) {
-    return <Text>Loading...</Text>;
+    return <Text style={styles.loadingText}>Loading...</Text>;
   }
 
-  const NutrientCircle = ({ label, value }) => (
-    <View style={styles.nutrientCircle}>
+  const NutrientCircle = ({ label, value, size = 'large' }) => (
+    <View style={[styles.nutrientCircle, size === 'small' && styles.smallCircle]}>
       <Text style={styles.nutrientValue}>{value}</Text>
       <Text style={styles.nutrientLabel}>{label}</Text>
     </View>
   );
 
-  const renderIngredients = ({ item }) => (
-    <View style={styles.ingredientItem}>
-      <Text>{item.original}</Text>
-    </View>
-  );
+  const renderIngredients = ({ item }) => {
+    const { amount, measures } = item;
+    const displayAmount = (measures[unitSystem].amount * portionSize).toFixed();
+    const displayUnit = measures[unitSystem].unitShort;
+
+    return (
+      <View style={styles.ingredientItem}>
+        <Text style={styles.ingredientText}>{`${displayAmount} ${displayUnit} of ${item.nameClean}`}</Text>
+      </View>
+    );
+  };
 
   const renderInstructions = () => {
     return recipe.analyzedInstructions && recipe.analyzedInstructions.length > 0 ? (
@@ -49,18 +62,85 @@ export function RecipeDetailsScreen({ route, navigation }) {
         </Text>
       ))
     ) : (
-      <Text>No instructions provided.</Text>
+      <Text style={styles.instructionText}>No instructions provided.</Text>
     );
+  };
+
+  const mainNutrients = ['Calories', 'Carbohydrates', 'Protein'];
+  const renderNutrients = () => {
+    return (
+      <>
+        <View style={styles.mainNutrientsContainer}>
+          {recipe.nutrition.nutrients
+            .filter((nutrient) => mainNutrients.includes(nutrient.name))
+            .map((nutrient) => (
+              <NutrientCircle
+                key={nutrient.name}
+                label={nutrient.name}
+                value={`${(nutrient.amount * portionSize).toFixed(0)} ${nutrient.unit}`}
+              />
+            ))}
+        </View>
+        {showAdditionalVitamins && (
+          <View style={styles.additionalNutrientsContainer}>
+            {recipe.nutrition.nutrients
+              .filter((nutrient) => !mainNutrients.includes(nutrient.name))
+              .map((nutrient) => (
+                <NutrientCircle
+                  key={nutrient.name}
+                  label={nutrient.name}
+                  value={`${(nutrient.amount * portionSize).toFixed(0)} ${nutrient.unit}`}
+                  size="small"
+                />
+              ))}
+          </View>
+        )}
+        <TouchableOpacity
+          style={styles.toggleButton}
+          onPress={() => setShowAdditionalVitamins(!showAdditionalVitamins)}
+        >
+          <Text style={styles.toggleButtonText}>
+            {showAdditionalVitamins ? 'Hide Additional Info' : 'Show More Info'}
+          </Text>
+        </TouchableOpacity>
+      </>
+    );
+  };
+
+  const toggleUnitSystem = () => {
+    setUnitSystem((prev) => (prev === 'metric' ? 'us' : 'metric'));
+  };
+
+  const increasePortion = () => {
+    setPortionSize((prev) => prev + 1);
+  };
+
+  const decreasePortion = () => {
+    if (portionSize > 1) {
+      setPortionSize((prev) => prev - 1);
+    }
+  };
+
+  const handlePortionInputChange = (value) => {
+    const parsedValue = parseInt(value, 10);
+    if (!isNaN(parsedValue) && parsedValue > 0) {
+      setPortionSize(parsedValue);
+    }
   };
 
   return recipe ? (
     <FlatList
       ListHeaderComponent={
         <View style={styles.headerContainer}>
-          <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
-            <Text style={styles.backButtonText}>Go Back</Text>
-          </TouchableOpacity>
 
+          <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
+            <SvgIcon
+              width={24}
+              height={24}
+              name={BackIcon}
+              color={Colors.textPrimary}
+            />
+          </TouchableOpacity>
           <Text style={styles.title}>{recipe.title}</Text>
           <Image source={{ uri: recipe.image }} style={styles.recipeImage} />
 
@@ -70,106 +150,140 @@ export function RecipeDetailsScreen({ route, navigation }) {
             </TouchableOpacity>
           </View>
 
-          <View style={styles.nutrientsContainer}>
-            <NutrientCircle 
-              label="Calories" 
-              value={`${recipe.nutrition ? recipe.nutrition.nutrients.find(n => n.name === 'Calories')?.amount.toFixed(0) : 'N/A'} kcal`} 
-            />
-            <NutrientCircle 
-              label="Protein" 
-              value={`${recipe.nutrition ? recipe.nutrition.nutrients.find(n => n.name === 'Protein')?.amount.toFixed(0) : 'N/A'} g`} 
-            />
-            <NutrientCircle 
-              label="Fat" 
-              value={`${recipe.nutrition ? recipe.nutrition.nutrients.find(n => n.name === 'Fat')?.amount.toFixed(0) : 'N/A'} g`} 
-            />
-            <NutrientCircle 
-              label="Carbs" 
-              value={`${recipe.nutrition ? recipe.nutrition.nutrients.find(n => n.name === 'Carbohydrates')?.amount.toFixed(0) : 'N/A'} g`} 
-            />
-          </View>
-
+          <View style={styles.nutrientsContainer}>{renderNutrients()}</View>
           <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Ingredients</Text>
+            <View style={styles.unitToggleContainer}>
+              <TouchableOpacity onPress={toggleUnitSystem} style={styles.unitToggleButton}>
+                <Text style={styles.unitToggleText}>{unitSystem === 'metric' ? 'Switch to US Units' : 'Switch to Metric Units'}</Text>
+              </TouchableOpacity>
+              <View style={styles.portionControls}>
+                <TouchableOpacity onPress={decreasePortion} style={styles.portionButton}>
+                  <Text>-</Text>
+                </TouchableOpacity>
+                <TextInput
+                  style={styles.portionSizeInput}
+                  value={portionSize.toString()}
+                  keyboardType="numeric"
+                  onChangeText={handlePortionInputChange}
+                />
+                <TouchableOpacity onPress={increasePortion} style={styles.portionButton}>
+                  <Text>+</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
           </View>
+          <Text style={styles.sectionTitle}>Ingredients</Text>
         </View>
       }
       data={recipe.extendedIngredients}
-      keyExtractor={(item) => item.id.toString()}
+      keyExtractor={(item, index) => `${item.id}-${index}`}
       renderItem={renderIngredients}
       ListFooterComponent={
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Instructions</Text>
           {renderInstructions()}
-
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>Additional Info</Text>
-            <Text>Price per Serving: ${recipe.pricePerServing}</Text>
-            <Text>Ready in Minutes: {recipe.readyInMinutes}</Text>
-            <Text>Servings: {recipe.servings}</Text>
-            <Text>Health Score: {recipe.healthScore}</Text>
+            <Text style={styles.additionalInfo}>Price per Serving: ${recipe.pricePerServing}</Text>
+            <Text style={styles.additionalInfo}>Ready in Minutes: {recipe.readyInMinutes}</Text>
+            <Text style={styles.additionalInfo}>Health Score: {recipe.healthScore}</Text>
           </View>
         </View>
       }
     />
   ) : (
-    <Text>Recipe not found</Text>
+    <Text style={styles.errorText}>Recipe not found</Text>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    padding: 16,
-    backgroundColor: '#F8F8F8',
+  loadingText: {
+    textAlign: 'center',
+    fontSize: 16,
+    color: '#333',
+    marginTop: 20,
   },
   headerContainer: {
     paddingBottom: 16,
+    paddingHorizontal: 16,
   },
   backButton: {
-    marginBottom: 10,
+    position: 'absolute',
+    marginTop: 10,
+    paddingRight:20,
   },
   backButtonText: {
     fontSize: 16,
-    color: '#007BFF',
+    color: Colors.textPrimary,
   },
   title: {
     fontSize: 28,
     fontWeight: 'bold',
-    color: '#333',
+    color: Colors.textPrimary,
     marginBottom: 10,
+    paddingLeft: 20
   },
   recipeImage: {
     width: '100%',
     height: 200,
     borderRadius: 10,
     marginBottom: 20,
+    borderWidth: 1,
+    borderColor: 'grey'
   },
   favButtonContainer: {
     alignItems: 'center',
     marginBottom: 20,
   },
   favButton: {
-    backgroundColor: '#FF6F61',
-    padding: 10,
+    backgroundColor: Colors.heartButton,
+    paddingVertical: 12,
+    paddingHorizontal: 20,
     borderRadius: 5,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+    elevation: 3,
   },
   favButtonText: {
-    color: '#FFF',
+    color: Colors.white,
     fontSize: 16,
+    textAlign: 'center',
+  },
+  Text: {
+    color: Colors.white,
+    fontSize: 16,
+    alignItems: 'center',
+    justifyContent: 'center',
+
   },
   nutrientsContainer: {
+    marginBottom: 20,
+  },
+  mainNutrientsContainer: {
     flexDirection: 'row',
     justifyContent: 'space-around',
-    marginBottom: 20,
+    marginBottom: 10,
+  },
+  additionalNutrientsContainer: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'space-around',
   },
   nutrientCircle: {
     width: 80,
     height: 80,
     borderRadius: 40,
-    backgroundColor: '#FFEBEE',
+    backgroundColor: '#E8F5E9',
     justifyContent: 'center',
     alignItems: 'center',
+    margin: 10,
+  },
+  smallCircle: {
+    width: 50,
+    height: 50,
+    borderRadius: 25,
   },
   nutrientValue: {
     fontSize: 18,
@@ -178,27 +292,66 @@ const styles = StyleSheet.create({
   },
   nutrientLabel: {
     fontSize: 12,
-    color: '#777',
+    color: '#333',
   },
   section: {
     marginBottom: 20,
+    paddingHorizontal: 16,
   },
   sectionTitle: {
-    fontSize: 20,
-    fontWeight: '600',
+    fontSize: 22,
+    fontWeight: 'bold',
+    color: Colors.textPrimary,
     marginBottom: 10,
-    color: '#333',
-  },
-  ingredientItem: {
-    marginBottom: 5,
   },
   instructionText: {
     fontSize: 16,
+    color: '#333',
     marginBottom: 5,
-    color: '#555',
   },
-  link: {
-    color: '#007BFF',
-    textDecorationLine: 'underline',
+  additionalInfo: {
+    fontSize: 14,
+    color: '#555',
+    marginBottom: 5,
+  },
+  unitToggleContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 10,
+  },
+  unitToggleButton: {
+    padding: 10,
+    backgroundColor: Colors.textPrimary,
+    borderRadius: 5,
+  },
+  unitToggleText: {
+    color: Colors.white,
+  },
+  portionControls: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  portionButton: {
+    padding: 10,
+    backgroundColor: Colors.textSecondary,
+    borderRadius: 5,
+    marginHorizontal: 5,
+  },
+  portionSizeText: {
+    fontSize: 16,
+    color: Colors.textPrimary,
+  },
+  ingredientItem: {
+    marginBottom: 10,
+  },
+  ingredientText: {
+    fontSize: 16,
+    color: '#333',
+  },
+  errorText: {
+    textAlign: 'center',
+    fontSize: 16,
+    color: 'red',
   },
 });

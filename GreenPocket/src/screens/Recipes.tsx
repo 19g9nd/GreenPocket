@@ -28,7 +28,6 @@ export function RecipesScreen({ route, navigation }) {
       dispatch(fetchRecipes({ category, query: searchQuery, offset: 0 }));
     }, 500);
 
-    // Clean timer when text changes
     return () => clearTimeout(timer);
   }, [searchQuery, category, dispatch]);
 
@@ -51,7 +50,9 @@ export function RecipesScreen({ route, navigation }) {
       onPress={() => navigation.navigate('RecipeDetails', { recipeId: item.id })}
     >
       <Image source={{ uri: item.image }} style={styles.recipeImage} />
-      <Text style={styles.recipeName}>{item.title}</Text>
+      <Text style={styles.recipeName} numberOfLines={2} ellipsizeMode="tail">
+        {item.title || "No title available"}
+      </Text>
     </TouchableOpacity>
   );
 
@@ -78,8 +79,7 @@ export function RecipesScreen({ route, navigation }) {
         <FlatList
           data={recipes}
           renderItem={renderRecipe}
-          keyExtractor={(item, index) => `${item.id}-${index}`} 
-          showsVerticalScrollIndicator={false}
+          keyExtractor={(item, index) => `${item.original}-${index}`} showsVerticalScrollIndicator={false}
           contentContainerStyle={styles.listContainer}
           onEndReached={loadMoreRecipes}
           onEndReachedThreshold={0.5}
@@ -94,25 +94,31 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 20,
-    backgroundColor: '#fff',
+    backgroundColor: '#FDFFEC',
   },
   headerText: {
     fontSize: 24,
     fontWeight: 'bold',
     marginBottom: 10,
+    color: '#3D3D3D',
   },
   listContainer: {
     paddingBottom: 10,
   },
   recipeItem: {
-    backgroundColor: '#f0f0f0',
+    backgroundColor: '#F1F5BD',
     padding: 15,
     borderRadius: 8,
     marginBottom: 10,
+    flexDirection: 'row',
+    alignItems: 'center',
   },
   recipeName: {
     fontSize: 18,
     fontWeight: '500',
+    color: '#3D3D3D',
+    flex: 1,
+    marginLeft: 10,
   },
   recipeImage: {
     width: 100,
@@ -121,26 +127,26 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   filterButton: {
-    backgroundColor: '#007BFF', // Blue color for button
+    backgroundColor: '#70a731',
     padding: 10,
-    borderRadius: 5,
+    borderRadius: 25,
     alignItems: 'center',
     marginBottom: 10,
   },
   filterButtonText: {
-    color: '#FFFFFF', // White color for text
+    color: '#FFFFFF',
     fontSize: 16,
     fontWeight: 'bold',
   },
   randomButton: {
-    backgroundColor: '#28A745', // Green color for random button
+    backgroundColor: '#6951f5',
     padding: 10,
-    borderRadius: 5,
+    borderRadius: 25,
     alignItems: 'center',
     marginBottom: 10,
   },
   randomButtonText: {
-    color: '#FFFFFF', // White color for random button text
+    color: '#FFFFFF',
     fontSize: 16,
     fontWeight: 'bold',
   },
@@ -149,12 +155,13 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     borderWidth: 1,
     borderColor: '#ddd',
-    borderRadius: 8,
+    borderRadius: 25,
     paddingHorizontal: 10,
     marginBottom: 20,
   },
   searchInput: {
     flex: 1,
     height: 40,
+    paddingHorizontal: 10,
   },
 });
