@@ -8,8 +8,10 @@ export const fetchRecipeDetails = createAsyncThunk(
     const response = await fetch(
       `https://api.spoonacular.com/recipes/${recipeId}/information?apiKey=${spoonacularAPIKey}&includeNutrition=true`
     );
+    if (!response.ok) {
+      throw new Error(result.message || 'Failed to connect to API');
+    }
     const data = await response.json();
-    console.log(data);
     return data;
   }
 );
@@ -18,8 +20,9 @@ export const fetchRandomRecipeDetails = createAsyncThunk(
   'recipeDetails/fetchRandomRecipeDetails',
   async (thunkAPI) => {
     const response = await fetch(
-      `https://api.spoonacular.com/recipes/random?number=1&apiKey=${spoonacularAPIKey}`
+      `https://api.spoonacular.com/recipes/random?number=1&apiKey=${spoonacularAPIKey}&includeNutrition=true`
     );
+
     const data = await response.json();
     return data.recipes[0]; // Random recipes come in an array, select the first one
   }

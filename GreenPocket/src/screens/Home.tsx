@@ -1,8 +1,10 @@
 import React from 'react';
 import { Text, FlatList, TouchableOpacity, View, StyleSheet } from 'react-native';
+import { useSelector } from 'react-redux';
 import { Colors } from '../components/colors';
 
 export function HomeScreen({ navigation }) {
+  const username = useSelector((state) => state.user.user.username);
   const categories = [
     { name: 'Breakfast', emoji: '🌅' },
     { name: 'Lunch', emoji: '🍎' },
@@ -14,7 +16,7 @@ export function HomeScreen({ navigation }) {
 
   const services = [
     { name: 'Menu for week', emoji: '📅' },
-    { name: 'Product list', emoji: '🛒' },
+    { name: 'Show Favourites', emoji: '💗' },
     { name: 'Find recipe', emoji: '🔍' },
   ];
 
@@ -29,7 +31,20 @@ export function HomeScreen({ navigation }) {
   );
 
   const renderService = ({ item }) => (
-    <TouchableOpacity style={styles.serviceItem}>
+    <TouchableOpacity
+      style={styles.serviceItem}
+      onPress={() => {
+        if (item.name === 'Find recipe') {
+          navigation.navigate('Recipes');
+        }
+        if (item.name === 'Menu for week') {
+          navigation.navigate('Diary');
+        }
+        if (item.name === 'Show Favourites') {
+          navigation.navigate('Favourites');
+        }
+      }}
+    >
       <Text style={styles.emoji}>{item.emoji}</Text>
       <Text style={styles.serviceText}>{item.name}</Text>
     </TouchableOpacity>
@@ -37,13 +52,13 @@ export function HomeScreen({ navigation }) {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.headerText}>Hi, User!</Text>
-      <Text style={styles.subHeaderText}>Recipes</Text>
+      <Text style={styles.headerText}>Hi, {username}!</Text>
+      <Text style={styles.sectionHeader}>Recipes</Text>
 
       <FlatList
         data={categories}
         renderItem={renderCategory}
-        keyExtractor={(item, index) => `${item.original}-${index}`}
+        keyExtractor={(item, index) => `${item.name}-${index}`}
         horizontal
         showsHorizontalScrollIndicator={false}
         contentContainerStyle={styles.listContainer}
@@ -54,7 +69,7 @@ export function HomeScreen({ navigation }) {
       <FlatList
         data={services}
         renderItem={renderService}
-        keyExtractor={(item, index) => `${item.original}-${index}`}
+        keyExtractor={(item, index) => `${item.name}-${index}`}
         horizontal
         showsHorizontalScrollIndicator={false}
         contentContainerStyle={styles.listContainer}

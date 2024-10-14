@@ -16,7 +16,7 @@ export function RecipeDetailsScreen({ route, navigation }) {
   const isFavourite = favourites.some((fav) => fav.id === recipeId);
 
   const [unitSystem, setUnitSystem] = useState('metric'); 
-  const [portionSize, setPortionSize] = useState(recipe?.servings || 1); // Default portion size to recipe servings
+  const [portionSize, setPortionSize] = useState(recipe?.servings || 1); 
   const [showAdditionalVitamins, setShowAdditionalVitamins] = useState(false); // Collapsible section
 
   const handleToggleFavourite = () => {

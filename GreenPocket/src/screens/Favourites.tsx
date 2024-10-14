@@ -48,9 +48,6 @@ export function FavouritesScreen() {
               <Image source={{ uri: item.image }} style={styles.recipeImage} />
               <View style={styles.recipeDetails}>
                 <Text style={styles.recipeTitle}>{item.title}</Text>
-                {item.description && (
-                  <Text style={styles.recipeDescription}>{item.description}</Text>
-                )}
               </View>
             </TouchableOpacity>
             <TouchableOpacity

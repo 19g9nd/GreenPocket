@@ -53,6 +53,10 @@ export const fetchRecipes = createAsyncThunk(
     }
 
     const response = await fetch(url);
+    if (!response.ok) {
+      throw new Error(result.message || 'Failed to connect to API');
+    }
+
     const data = await response.json();
 
     // Removing duplicates
@@ -77,14 +81,13 @@ export const recipesSlice = createSlice({
     offset: 0,
     number: 10,
     totalResults: 0,
-    category: '', // Defaults to an empty string
+    category: '',
     query: '',
-    diets: [], // Empty array means no diet filters
-    calories: [0, 0], // Default calories range to [0, 0]
+    diets: [], 
+    calories: [0, 0], 
     onlyFavourites: false,
     cuisine: '',
     excludedCuisine: [],
-    categories: [], // Default empty array
   },
   reducers: {
     clearRecipes: (state) => {
