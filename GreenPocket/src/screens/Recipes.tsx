@@ -9,6 +9,7 @@ import {
   Image,
   TextInput,
 } from 'react-native';
+import { Colors } from '../components/colors';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchRecipes, selectRecipes, selectLoading, selectOffset, selectTotalResults, clearRecipes } from '../redux/recipesSlice';
 import { fetchRandomRecipeDetails } from '../redux/recipeDetailsSlice';
@@ -94,7 +95,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 20,
-    backgroundColor: '#FDFFEC',
+    backgroundColor: Colors.background,
   },
   headerText: {
     fontSize: 24,
@@ -106,7 +107,7 @@ const styles = StyleSheet.create({
     paddingBottom: 10,
   },
   recipeItem: {
-    backgroundColor: '#F1F5BD',
+    backgroundColor: Colors.categoryItem,
     padding: 15,
     borderRadius: 8,
     marginBottom: 10,
@@ -127,7 +128,7 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   filterButton: {
-    backgroundColor: '#70a731',
+    backgroundColor: '#388E3C',
     padding: 10,
     borderRadius: 25,
     alignItems: 'center',
@@ -156,6 +157,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#ddd',
     borderRadius: 25,
+    backgroundColor: '#FFFFFF',
     paddingHorizontal: 10,
     marginBottom: 20,
   },

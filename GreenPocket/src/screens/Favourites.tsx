@@ -84,7 +84,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     borderRadius: 15,
-    backgroundColor: Colors.recipeItem,
+    backgroundColor: Colors.categoryItem,
     padding: 15,
     shadowColor: '#000',
     shadowOffset: {

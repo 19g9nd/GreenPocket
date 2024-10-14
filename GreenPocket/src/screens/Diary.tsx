@@ -42,11 +42,11 @@ export function DiaryScreen({ navigation }) {
     const weeklyMeals = mealPlan?.week;
 
     return (
-        <ScrollView style={styles.container}  showsVerticalScrollIndicator={false}>
+        <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
             <Text style={styles.title}>Meal Plan:</Text>
             <View style={styles.buttonContainer}>
-                <Button title="Filters" onPress={() => setFilterModalVisible(true)} />
-                <Button title="Refresh" onPress={handleRefresh} />
+                <Button color="#388E3C" title="Filters" onPress={() => setFilterModalVisible(true)} />
+                <Button color="#388E3C" title="Refresh" onPress={handleRefresh} />
             </View>
             {weeklyMeals ? (
                 Object.keys(weeklyMeals).map((day) => (
@@ -58,7 +58,13 @@ export function DiaryScreen({ navigation }) {
                             showsHorizontalScrollIndicator={false}
                             keyExtractor={(item) => item.id.toString()}
                             renderItem={({ item }) => (
-                                <TouchableOpacity style={styles.mealCard} onPress={() => navigation.navigate('RecipeDetails', { recipeId: item.id, image: `https://spoonacular.com/recipeImages/${item.id}-${item.imageType}` })}>
+                                <TouchableOpacity
+                                    style={styles.mealCard}
+                                    onPress={() => navigation.navigate('RecipeDetails', {
+                                        recipeId: item.id,
+                                        image: `https://spoonacular.com/recipeImages/${item.id}-${item.imageType}`,
+                                    })}
+                                >
                                     <Image
                                         source={{ uri: `https://img.spoonacular.com/recipes/${item.id}-90x90.${item.imageType}` }}
                                         style={styles.mealImage}
@@ -125,11 +131,12 @@ export function DiaryScreen({ navigation }) {
 const styles = StyleSheet.create({
     container: {
         padding: 16,
-        backgroundColor: '#f5f5f5',
+        backgroundColor: '#E8F5E9', 
     },
     title: {
         fontSize: 24,
         fontWeight: 'bold',
+        color: '#388E3C',
         marginBottom: 16,
     },
     buttonContainer: {
@@ -139,7 +146,7 @@ const styles = StyleSheet.create({
     },
     dayContainer: {
         marginBottom: 16,
-        backgroundColor: '#fff',
+        backgroundColor: '#FFFFFF',
         borderRadius: 8,
         padding: 16,
         shadowColor: '#000',
@@ -154,6 +161,7 @@ const styles = StyleSheet.create({
     dayTitle: {
         fontSize: 20,
         fontWeight: 'bold',
+        color: '#388E3C',
         marginBottom: 8,
     },
     mealCard: {
@@ -161,7 +169,7 @@ const styles = StyleSheet.create({
         width: 120,
         borderRadius: 8,
         padding: 8,
-        backgroundColor: '#e8e8e8',
+        backgroundColor: '#C8E6C9',
         alignItems: 'center',
     },
     mealImage: {
@@ -174,10 +182,12 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
         marginVertical: 4,
         textAlign: 'center',
+        color: '#388E3C', 
     },
     loadingText: {
         textAlign: 'center',
         marginTop: 20,
+        color: '#388E3C', 
     },
     errorText: {
         textAlign: 'center',
@@ -187,6 +197,7 @@ const styles = StyleSheet.create({
     noMealsText: {
         textAlign: 'center',
         marginTop: 20,
+        color: '#388E3C'
     },
     modalView: {
         margin: 20,
@@ -208,17 +219,20 @@ const styles = StyleSheet.create({
         textAlign: 'center',
         fontSize: 18,
         fontWeight: 'bold',
+        color: '#388E3C', 
     },
     input: {
         width: '80%',
         height: 40,
-        borderColor: 'gray',
+        borderColor: '#81C784', 
         borderWidth: 1,
+        borderRadius: 8,
         marginBottom: 15,
         paddingHorizontal: 10,
+        color: '#388E3C', 
     },
     applyButton: {
-        backgroundColor: '#2196F3',
+        backgroundColor: '#388E3C', 
         borderRadius: 20,
         padding: 10,
         elevation: 2,

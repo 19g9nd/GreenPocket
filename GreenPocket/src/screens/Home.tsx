@@ -55,14 +55,16 @@ export function HomeScreen({ navigation }) {
       <Text style={styles.headerText}>Hi, {username}!</Text>
       <Text style={styles.sectionHeader}>Recipes</Text>
 
-      <FlatList
-        data={categories}
-        renderItem={renderCategory}
-        keyExtractor={(item, index) => `${item.name}-${index}`}
-        horizontal
-        showsHorizontalScrollIndicator={false}
-        contentContainerStyle={styles.listContainer}
-      />
+      <View style={styles.recipesContainer}>
+        <FlatList
+          data={categories}
+          renderItem={renderCategory}
+          keyExtractor={(item, index) => `${item.name}-${index}`}
+          numColumns={2} // Display in 2 columns
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={styles.listContainer}
+        />
+      </View>
 
       <Text style={styles.sectionHeader}>Services</Text>
 
@@ -90,11 +92,6 @@ const styles = StyleSheet.create({
     color: Colors.textPrimary,
     marginBottom: 10,
   },
-  subHeaderText: {
-    fontSize: 18,
-    color: Colors.textPrimary,
-    marginBottom: 20,
-  },
   sectionHeader: {
     fontSize: 18,
     fontWeight: 'bold',
@@ -105,11 +102,17 @@ const styles = StyleSheet.create({
   listContainer: {
     paddingBottom: 10,
   },
+  recipesContainer: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'space-between',
+  },
   categoryItem: {
     backgroundColor: Colors.categoryItem,
-    padding: 15,
+    padding: 10,
     borderRadius: 12,
-    marginRight: 10,
+    margin: 5, 
+    width: '48%',
     alignItems: 'center',
     flexDirection: 'row',
   },
@@ -121,14 +124,14 @@ const styles = StyleSheet.create({
   },
   serviceItem: {
     backgroundColor: Colors.serviceItem,
-    padding: 15,
+    padding: 10,
     borderRadius: 12,
     marginRight: 10,
     alignItems: 'center',
     flexDirection: 'row',
   },
   serviceText: {
-    fontSize: 16,
+    fontSize: 14, 
     fontWeight: '500',
     marginLeft: 10,
     color: Colors.textPrimary,
